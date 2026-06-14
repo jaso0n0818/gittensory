@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { errorMessage, jsonString, normalizeRepoFullName, parseJson, repoParts, strippedErrorMessage } from "../../src/utils/json";
+import { errorMessage, jsonString, normalizeRepoFullName, nowIso, parseJson, repoParts, strippedErrorMessage } from "../../src/utils/json";
 
 describe("JSON and string utility helpers", () => {
   it("keeps JSON parsing and stringification fallbacks explicit", () => {
@@ -20,5 +20,13 @@ describe("JSON and string utility helpers", () => {
     expect(errorMessage("string failure", "fallback failure")).toBe("fallback failure");
     expect(strippedErrorMessage(new Error("Error: wrapped failure"), "fallback failure")).toBe("wrapped failure");
     expect(strippedErrorMessage("string failure", "fallback failure")).toBe("fallback failure");
+    expect(errorMessage(new Error(""))).toBe("unknown error");
+    expect(errorMessage({ code: "E_FAIL" })).toBe("unknown error");
+  });
+
+  it("returns an ISO-8601 timestamp from nowIso", () => {
+    const stamp = nowIso();
+    expect(stamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+    expect(Date.parse(stamp)).not.toBeNaN();
   });
 });
