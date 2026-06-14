@@ -71,6 +71,13 @@ IGNORED = "not numeric"
     expect(detectActiveModel({})).toBe("unknown");
   });
 
+  it("includes unrecognized constant names only when knownOnly is disabled", () => {
+    const source = "CUSTOM_CONSTANT = 42\nOSS_EMISSION_SHARE = 0.9\nIGNORED = not-a-number";
+    expect(parsePythonNumberConstants(source)).toEqual({ OSS_EMISSION_SHARE: 0.9 });
+    expect(parsePythonNumberConstants(source, { knownOnly: false })).toMatchObject({ CUSTOM_CONSTANT: 42, OSS_EMISSION_SHARE: 0.9 });
+    expect(parsePythonNumberConstants(source, { knownOnly: false })).not.toHaveProperty("IGNORED");
+  });
+
   it("prefers exponential saturation when mixed upstream constants are present", () => {
     const parsed = parsePythonNumberConstants(`
 MERGED_PR_BASE_SCORE = 25
