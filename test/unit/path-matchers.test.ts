@@ -175,6 +175,25 @@ describe("isConfigFile", () => {
     }
   });
 
+  it("matches coverage, editor, and devcontainer config files", () => {
+    for (const path of [
+      "codecov.yml",
+      ".github/codecov.yaml",
+      ".codecov.yml",
+      "sonar-project.properties",
+      ".yarnrc.yml",
+      ".devcontainer/devcontainer.json",
+    ]) {
+      expect(isConfigFile(path)).toBe(true);
+    }
+  });
+
+  it("does not treat codecov-like source names as config", () => {
+    for (const path of ["src/codecov-client.ts", "docs/sonar-notes.md"]) {
+      expect(isConfigFile(path)).toBe(false);
+    }
+  });
+
   it("matches config files by known filename prefix", () => {
     for (const path of ["tsconfig.build.json", "vitest.config.ts", ".env.local", ".eslintrc.json", ".prettierrc.js"]) {
       expect(isConfigFile(path)).toBe(true);
@@ -212,6 +231,8 @@ describe("classifyChangedFile", () => {
       ["vitest.config.ts", "config"],
       ["wrangler.jsonc", "config"],
       ["turbo.json", "config"],
+      ["codecov.yml", "config"],
+      [".devcontainer/devcontainer.json", "config"],
       ["test/unit/app.test.ts", "test"],
       ["README.md", "docs"],
       ["src/app.ts", "source"],

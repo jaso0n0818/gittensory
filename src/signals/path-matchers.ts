@@ -76,6 +76,14 @@ const CONFIG_FILE_NAMES: ReadonlySet<string> = new Set([
   ".gitignore",
   ".gitattributes",
   ".dockerignore",
+  // Coverage and quality gate config (Codecov, Sonar).
+  "codecov.yml",
+  "codecov.yaml",
+  ".codecov.yml",
+  "sonar-project.properties",
+  // Package-manager and editor dev environment config.
+  ".yarnrc.yml",
+  ".yarnrc.yaml",
 ]);
 
 // Filename prefixes that identify build, lint, test-runner, and environment config files.
@@ -145,9 +153,11 @@ export function isDependencyManifestFile(path: string): boolean {
  * lower-effort than genuine source changes, so slop signals can weight them differently (#561).
  */
 export function isConfigFile(path: string): boolean {
+  const norm = normalize(path);
   const base = basename(path);
   if (CONFIG_FILE_NAMES.has(base)) return true;
   if (CONFIG_FILE_PREFIXES.some((prefix) => base.startsWith(prefix))) return true;
+  if (/(^|\/)\.devcontainer\/devcontainer\.json$/.test(norm)) return true;
   if (/\.(config|rc)\.[a-z0-9]+$/i.test(base)) return true;
   // `.stylelintrc`-style: dot-prefixed name with no extension after "rc"; `custom.rc`: dotted rc extension.
   return base.endsWith(".rc") || /^\.[^.]+rc$/i.test(base);
